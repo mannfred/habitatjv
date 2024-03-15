@@ -5,6 +5,30 @@ library(tidyverse)
 # From Andrew Huang: for each season, we define “Stewardship Priority” as the top 10 percentile of 
 # species with the highest proportion
 
+# read in long format jv data
+jv_longformat <- 
+  readRDS(file=here("data/rds_files/jv_longformat.rds"))
+
+# new column for relative percentiles of proportion of global population
+# and new column for JV priority designation if in top 90 percentile
+jv_rosen_data <- jv_longformat %>% 
+  mutate(percentile_pop = percent_rank(prop_pop)) %>% 
+  mutate(top_90 = if_else(percentile_pop > .9,
+                          "TRUE",
+                          "FALSE",
+                          missing = "NA"))
+
+# save full dataset with priority designations
+saveRDS(jv_rosen_data, file=here("data/rds_files/jv_data_with_birdgroups_biomes_and_priorities.rds"))
+
+
+
+
+
+
+
+# older priority designation code  ----------------------------------------
+
 # Here, we start with the Canadian Intermountain JV
 cijv_data <- 
   readRDS(file=here("data/rds_files/jv_longformat.rds")) %>% 
@@ -22,7 +46,7 @@ cijv_data <- cijv_data %>%
 
 # Now, find priority species for Pacific Birds JV
 pbjv_data <- 
-  readRDS(file=here("data/rds_files/jv_data_with_birdgroups_and_biomes.rds")) %>% 
+  readRDS(file=here("data/rds_files/jv_longformat.rds")) %>% 
   dplyr::filter(full_name == "PacificBirds_JV_Boundary.shp")
 
 pbjv_data <- pbjv_data %>% 
@@ -35,11 +59,6 @@ pbjv_data <- pbjv_data %>%
 # create new dataframe with new priority columns
 jv_rosen_data <- dplyr::bind_rows(pbjv_data, cijv_data)
 saveRDS(jv_rosen_data, file=here("data/rds_files/jv_data_with_birdgroups_biomes_and_priorities.rds"))
-
-
-
-
-# older priority designation code  ----------------------------------------
 
 # 294 species for CIJV 
 migrants <- cijv_data[which(cijv_data$Resident=="FALSE"),]
