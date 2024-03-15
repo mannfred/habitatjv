@@ -2,7 +2,7 @@ library(here)
 library(tidyverse)
 
 # ------------------------------------------
-# From Andrew Huang: for each season, we define “Stewardship Priority” as the top 10 percentile of 
+# From Andrew Huang: for each season, we define “Stewardship Responsibility” as the top 10 percentile of 
 # species with the highest proportion
 
 # read in long format jv data
