@@ -20,10 +20,11 @@ jv_priorities <- jv_longformat %>%
                           missing = "NA")) %>%
   rename(season = breeding_season) %>% 
   # remove extra rows for the resident species (if same abundance each season)
-  # first, change season value to "resident", then drop duplicate rows with distinct()
+  # first, change season value to "resident"
   mutate(season = if_else(Resident == TRUE,
                           "resident",
                           season)) %>% 
+  # then drop duplicate rows with distinct()
   distinct() %>% 
   ungroup()
 
