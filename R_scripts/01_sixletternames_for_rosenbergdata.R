@@ -27,7 +27,7 @@ rosenberg_data <-
 
 
 # are all CIJV species with raster data represented in the JV dataset?
-cijv_folder <- list.files(path=here("data/cijv"))
+cijv_folder <- list.files(path=here("data/CIJV"))
 cijv_spp_w_rasters <- 
   stringr::str_split_i(cijv_folder, pattern="_", i=2) %>% 
   unique() #320 species 

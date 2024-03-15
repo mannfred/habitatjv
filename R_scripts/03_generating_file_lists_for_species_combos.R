@@ -8,6 +8,15 @@ jv_rosen_data <- readRDS(file=here("data/rds_files/jv_data_with_birdgroups_biome
 # ----------------------------------------------
 # extract season information from file names
 
+# going to need to fuzzy match from here because the file names are too variable..
+# $JV, $species_code, $resident,  $season
+file_path <- 
+jv_rosen_data$file_path <- 
+  paste(here("data//"), jv_rosen_data$JV, sep="") %>% #folder name
+  paste(., jv_rosen_data$JV, sep="/") %>% #JV name
+  paste(., jv_rosen_data$species_code, jv_rosen_data$resident, jv_rosen_data$breeding_season, sep="_")
+
+sapply(jv_rosen_data, function(p) {c(p$JV, p$species_code, p$resident, p$breeding_season)}) 
 
 #check file names to see how many types of seasons there are
 season <- 
