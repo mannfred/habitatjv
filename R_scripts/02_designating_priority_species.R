@@ -4,11 +4,42 @@ library(tidyverse)
 # ------------------------------------------
 # From Andrew Huang: for each season, we define “Stewardship Priority” as the top 10 percentile of 
 # species with the highest proportion
-# Here, we start with the Canadian Intermountain JV
 
+# Here, we start with the Canadian Intermountain JV
 cijv_data <- 
   readRDS(file=here("data/rds_files/jv_longformat.rds")) %>% 
   dplyr::filter(full_name == "CIJV_Boundary_Complete.shp")
+
+# new column for relative percentiles of proportion of global population
+# and new column for JV priority designation if in top 90 percentile
+cijv_data <- cijv_data %>% 
+  mutate(percentile_pop = percent_rank(prop_pop)) %>% 
+  mutate(top_90 = if_else(percentile_pop > .9,
+                          "TRUE",
+                          "FALSE",
+                          missing = "NA"))
+
+
+# Now, find priority species for Pacific Birds JV
+pbjv_data <- 
+  readRDS(file=here("data/rds_files/jv_data_with_birdgroups_and_biomes.rds")) %>% 
+  dplyr::filter(full_name == "PacificBirds_JV_Boundary.shp")
+
+pbjv_data <- pbjv_data %>% 
+  mutate(percentile_pop = percent_rank(prop_pop)) %>% 
+  mutate(top_90 = if_else(percentile_pop > .9,
+                          "TRUE",
+                          "FALSE",
+                          missing = "NA"))
+
+# create new dataframe with new priority columns
+jv_rosen_data <- dplyr::bind_rows(pbjv_data, cijv_data)
+saveRDS(jv_rosen_data, file=here("data/rds_files/jv_data_with_birdgroups_biomes_and_priorities.rds"))
+
+
+
+
+# older priority designation code  ----------------------------------------
 
 # 294 species for CIJV 
 migrants <- cijv_data[which(cijv_data$Resident=="FALSE"),]
@@ -18,6 +49,8 @@ residents <- cijv_data[which(cijv_data$Resident=="TRUE"),]
 unique(residents$species) # 33 spp
 
 
+
+  
 
 # ------------------------------------------
 # find priority species for residents
@@ -30,11 +63,10 @@ priority_finder <-
   function(migrant_type=c(migrants, residents), 
            season=c("breeding_prop_pop", "nbreeding_prop_pop", 
                     "prebreedingm_prop_pop", "postbreedingm_prop_pop")) {
-    
+
     migrant_type %>%  
     dplyr::filter(migrant_type[[season]] > quantile(migrant_type[[season]], 0.90, na.rm=TRUE)) 
     }
-
 
 
 # assign priority for residents
