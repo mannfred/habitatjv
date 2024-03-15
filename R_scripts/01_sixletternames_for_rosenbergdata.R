@@ -11,7 +11,9 @@ jv_data <-
   read_csv(file=here("data/JV_Percent_Bird_Populations_Combined.csv")) %>% 
   dplyr::filter(
     full_name == "PacificBirds_JV_Boundary.shp" | 
-    full_name == "CIJV_Boundary_Complete.shp")
+    full_name == "CIJV_Boundary_Complete.shp") %>% 
+  dplyr::rename(resident = Resident) %>% 
+  dplyr::mutate(resident = if_else(resident == TRUE, "resident", "non-resident", missing=NA))
 
 # import data from Rosenberg et al (2019): https://www.science.org/doi/10.1126/science.aaw1313
 # only 529 species represented, so there may not be complete overlap with `jv_data`
