@@ -11,17 +11,24 @@ jv_longformat <-
 
 # new column for relative percentiles of proportion of global population
 # and new column for JV priority designation if in top 90 percentile
-jv_rosen_data <- jv_longformat %>% 
+jv_priorities <- jv_longformat %>% 
+  group_by(full_name) %>% 
   mutate(percentile_pop = percent_rank(prop_pop)) %>% 
-  mutate(top_90 = if_else(percentile_pop > .9,
+  mutate(jv_priority = if_else(percentile_pop > .9,
                           "TRUE",
                           "FALSE",
-                          missing = "NA"))
+                          missing = "NA")) %>%
+  rename(season = breeding_season) %>% 
+  # remove extra rows for the resident species (if same abundance each season)
+  # first, change season value to "resident", then drop duplicate rows with distinct()
+  mutate(season = if_else(Resident == TRUE,
+                          "resident",
+                          season)) %>% 
+  distinct() %>% 
+  ungroup()
 
 # save full dataset with priority designations
-saveRDS(jv_rosen_data, file=here("data/rds_files/jv_data_with_birdgroups_biomes_and_priorities.rds"))
-
-
+saveRDS(jv_priorities, file=here("data/rds_files/jv_data_with_birdgroups_biomes_and_priorities.rds"))
 
 
 
