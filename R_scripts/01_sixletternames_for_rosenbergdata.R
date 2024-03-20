@@ -5,7 +5,7 @@ library(tidyverse)
 # import data
 
 
-# import JV data and filter for specific boundaries (Pacific and CIJV)
+# import JV data and filter for specific boundaries (PacificBirds and CIJV)
 # 804 rows (species) some overlapping between boundaries)
 jv_data <- 
   read_csv(file=here("data/JV_Percent_Bird_Populations_Combined.csv")) %>% 
@@ -26,27 +26,39 @@ rosenberg_data <-
 # inspecting imported data
 
 
-# are all CIJV species with raster data represented in the JV dataset?
-cijv_folder <- list.files(path=here("data/CIJV"))
-cijv_spp_w_rasters <- 
-  stringr::str_split_i(cijv_folder, pattern="_", i=2) %>% 
-  unique() #320 species 
+# are all CIJV and PacficBirds species with raster data represented in the JV dataset?
+raster_files <- 
+  c(list.files(path=here("data/CIJV")), list.files(path=here("data/PacificBirds"))) %>% 
+  stringr::str_remove(., "_JV") # change "PacificBirds_JV" to "PacificBirds" to match database convention
 
-cijv_spp_w_data <- 
+
+spp_w_rasters <- 
+  stringr::str_split_i(raster_files, pattern="_", i=2) %>% 
+  unique() #515 species 
+
+spp_w_data <- 
   jv_data %>% 
-  dplyr::filter(full_name == "CIJV_Boundary_Complete.shp") %>% 
+  dplyr::filter(full_name == "CIJV_Boundary_Complete.shp" | full_name == "PacificBirds_JV_Boundary.shp") %>% 
   select(species_code) %>% 
-  unique() #317 species
+  unique() #506 species
 
-# 3 CIJV species have rasters but are not in the JV data
-# "brnthr"  "whrsan"  "winwre3"
-missing_spp1 <- cijv_spp_w_rasters[which(!(cijv_spp_w_rasters %in% cijv_spp_w_data$species_code))]
-saveRDS(missing_spp1, file=here("data/rds_files/missing_spp1.rds"))
+# --------------------------------------------
+# find species with missing data
 
-# there are  13 CIJV species with JV data but are not represented in the Rosenberg data
-# therefore 13+3 (16) CIJV species with raster data will not be sorted
-missing_spp2 <- jv_data$species_code[which(!(jv_data$species %in% rosenberg_data$species) & jv_data$full_name=="CIJV_Boundary_Complete.shp")]
-saveRDS(missing_spp2, file=here("data/rds_files/missing_spp2.rds"))
+
+# 12 species have rasters but are not in the JV data
+# "brnthr"  "winwre3" "blabit1" "chiegr"  "clrwar1" "fotswi"  "greroa"  "gubter1" "lesnig"  "pinjay" "strher"  "yelrai" 
+missing_spp1 <- spp_w_rasters[which(!(spp_w_rasters %in% spp_w_data$species_code))]
+
+# there are  120 CIJV/PacificBirds species with JV data but are not represented in the Rosenberg data
+# these species will be automatically filtered out when we left join the Rosenberg data to the JV data
+missing_spp2 <- unique(jv_data$species_code)[which(!(unique(jv_data$species) %in% rosenberg_data$species))]
+
+# any overlap?
+any(missing_spp1 %in% missing_spp2) #FALSE
+missing_spp <- c(missing_spp1, missing_spp2)
+saveRDS(missing_spp, file=here("data/rds_files/missing_spp.rds"))
+
 
 
 
@@ -65,9 +77,20 @@ jv_rosen_data <-
 # each row with a unique `prop_pop` entry
 jv_longformat <-
   jv_rosen_data %>% 
-  tidyr::pivot_longer(cols = ends_with("prop_pop"), values_to = "prop_pop", names_to = "breeding_season") %>% 
-  dplyr::mutate(breeding_season = str_remove(.$breeding_season, "_prop_pop")) 
+  tidyr::pivot_longer(cols = ends_with("prop_pop"), values_to = "prop_pop", names_to = "season") %>% 
+  dplyr::mutate(season = str_remove(.$season, "_prop_pop")) %>% 
+  dplyr::mutate(file_name_suffixes = case_when(season == "nbreeding" & resident == "non-resident" ~ "full-year_max_21.tif",
+                                               season == "breeding" & resident == "non-resident" ~ "breeding_abundance_seasonal_mean_21.tif",
+                                               season == "postbreedingm"& resident == "non-resident" ~ "post-breeding_mig_abundance_seasonal_mean_21.tif",
+                                               season == "prebreedingm" & resident == "non-resident" ~ "pre-breeding_mig_abundance_seasonal_mean_21.tif",
+                                               resident == "resident" ~ "abundance_seasonal_mean_21.tif")) 
+file_path <- 
+  paste(here("data//"), jv_longformat$JV, sep="") %>% #folder name
+  paste(., jv_longformat$JV, sep="/") %>% #JV name
+  paste(., jv_longformat$species_code, jv_longformat$resident, jv_longformat$file_name_suffixes, sep="_")
 
+# add file paths to dataframe
+jv_longformat$file_path <- file_path
 saveRDS(jv_longformat, file=here("data/rds_files/jv_longformat.rds"))
 
   
