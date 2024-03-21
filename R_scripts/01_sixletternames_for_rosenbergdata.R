@@ -92,6 +92,32 @@ file_path <-
 
 # add file paths to dataframe
 jv_longformat$file_path <- file_path
+
+
+# assign stewardship responsibility labels --------------------------------
+
+# From Andrew Huang: for each season, we define “Stewardship Responsibility” as 
+# the top 90 percentile of species with the highest proportion
+
+# new column for relative percentiles of proportion of global population
+# and new column for JV responsibility designation if in top 90 percentile
+jv_longformat <- jv_longformat %>% 
+  group_by(full_name) %>% 
+  mutate(percentile_pop = percent_rank(prop_pop)) %>% 
+  mutate(stewardship_responsibility = if_else(percentile_pop > .9,
+                                     "stewardship-responsibility",
+                                     "all-species",
+                                     missing = "NA")) %>%
+  # remove extra rows for the resident species (if same abundance each season)
+  # first, change season value to "resident"
+  mutate(season = if_else(resident == TRUE,
+                          "resident",
+                          season)) %>% 
+  # then drop duplicate rows with distinct()
+  distinct() %>% 
+  ungroup()
+
+# save full dataset with priority designations
 saveRDS(jv_longformat, file=here("data/rds_files/jv_longformat.rds"))
 
   
