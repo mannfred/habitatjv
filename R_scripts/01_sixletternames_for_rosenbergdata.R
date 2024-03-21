@@ -2,6 +2,7 @@ library(here)
 library(tidyverse)
 
 # --------------------------------------------
+# data from: https://cornell.app.box.com/v/JVeBirdCollab
 # import data
 
 

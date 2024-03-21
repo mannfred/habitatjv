@@ -1,62 +1,8 @@
 library(here)
-library(tidystringdist)
 library(tidyverse)
 
 
 jv_rosen_data <- readRDS(file=here("data/rds_files/jv_data_with_birdgroups_biomes_and_priorities.rds"))
-
-
-# ----------------------------------------------
-# extract season information from file names
-# data from: https://cornell.app.box.com/v/JVeBirdCollab
-
-
-
-
-#check file names to see how many types of seasons there are
-season <- 
-  list.files(path = here("data/cijv/"), pattern=".tif") %>% 
-  stringr::str_remove(".tif") %>% 
-  stringr::str_split(pattern="_") %>% 
-  lapply(., "[", c(3:5)) %>% 
-  lapply(., paste, collapse = "_") %>%
-  unlist()
-
-# six seasons:
-# [1] "non-resident_abundance_full-year"   "non-resident_breeding_abundance"   
-# [3] "non-resident_post-breeding_mig"     "non-resident_pre-breeding_mig"     
-# [5] "non-resident_nonbreeding_abundance" "resident_abundance_seasonal" 
-unique(season)
-
-
-# import raster files and extract species names from file names
-species_code <- 
-  list.files(path=here("data/cijv/"), pattern=".tif") %>% 
-  stringr::str_split_i("_", i = 2)
-
-
-# create data frame that associates seasons with filenames
-species_filenames_seasons <- 
-  data.frame(species_code = species_code, 
-             file_name = list.files(path=here("data/cijv/"), pattern = ".tif"), 
-             season = season)
-
-# add priority to above data frame
-priority_lookup <- 
-  jv_rosen_data %>% 
-  dplyr::filter(full_name=="CIJV_Boundary_Complete.shp") %>% 
-  tidyr::pivot_longer(cols = starts_with("priority")) %>% 
-  mutate(lookup=paste(priority_lookup$species_code, 
-                      str_split_i(.$name, "_", 2), sep="_"))
-
-# if `species_code`[i] + `season`[i] matches `priority_lookup$species_code` + `name`, then copy priority
-
-
-   paste(species_filenames_seasons$species_code[i], 
-              str_split_i(species_filenames_seasons$season[i], "_", 2), sep="_")
-  i2 <- paste(priority_lookup$species_code[i], 
-              str_split_i(priority_lookup$name[i], "_", 2), sep="_")
-}
 
 
 # ----------------------------------------------
