@@ -2,11 +2,11 @@ library(here)
 library(tidyverse)
 
 
-jv_rosen_data <- readRDS(file=here("data/rds_files/jv_data_with_birdgroups_biomes_and_priorities.rds"))
+jv_rosen_data <- readRDS(file=here("data/rds_files/jv_data_with_birdgroups_biomes_and_responsibility.rds"))
 
 
 # ----------------------------------------------
-# get permutations of `breeding_biome` and `bird_group`
+# get permutations of all variables of interest: `breeding_biome` and `bird_group`
 # then, filter JV data by all possible `breeding_biome` and `bird_group` and `priority` permutations
 
 biome_group_combos <-

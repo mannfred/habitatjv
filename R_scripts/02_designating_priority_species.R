@@ -10,10 +10,10 @@ jv_longformat <- readRDS(file=here("data/rds_files/jv_longformat.rds"))
 
 # new column for relative percentiles of proportion of global population
 # and new column for JV priority designation if in top 90 percentile
-jv_priorities <- jv_longformat %>% 
+jv_responsibility <- jv_longformat %>% 
   group_by(full_name) %>% 
   mutate(percentile_pop = percent_rank(prop_pop)) %>% 
-  mutate(jv_priority = if_else(percentile_pop > .9,
+  mutate(jv_responsibility = if_else(percentile_pop > .9,
                           "TRUE",
                           "FALSE",
                           missing = "NA")) %>%
@@ -27,7 +27,7 @@ jv_priorities <- jv_longformat %>%
   ungroup()
 
 # save full dataset with priority designations
-saveRDS(jv_priorities, file=here("data/rds_files/jv_data_with_birdgroups_biomes_and_priorities.rds"))
+saveRDS(jv_responsibility, file=here("data/rds_files/jv_data_with_birdgroups_biomes_and_responsibility.rds"))
 
 
 
