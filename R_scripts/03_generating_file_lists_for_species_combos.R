@@ -14,6 +14,9 @@ variable_combos <-
   unique() %>% 
   as_tibble()
 
+saveRDS(variable_combos, file=here("data/rds_files/variable_combos.rds"))
+
+
 
 file_combos <- list()
 for (i in 1:nrow(variable_combos)){
@@ -24,15 +27,34 @@ for (i in 1:nrow(variable_combos)){
   biome_i <- stringr::str_split_i(variable_combos[i,], pattern="_", i=4)
   season_i <- stringr::str_split_i(variable_combos[i,], pattern="_", i=5)
  
-  file_combos[[i]] <- 
-    jv_rosen_data %>% 
-    dplyr::filter(JV == jv_i) %>% 
-    dplyr::filter(jv_responsibility == responsibility_i) %>% 
-    dplyr::filter(bird_group == group_i) %>% 
-    dplyr::filter(breeding_biome == biome_i) %>% 
-    dplyr::filter(season == season_i) %>% 
-    dplyr::select(file_path) %>% 
-    unique()
+  if (responsibility_i == "stewardship-responsibilty") { 
+    
+    # limit to species that are of stewardship responsibility
+    file_combos[[i]] <- 
+      jv_rosen_data %>% 
+      dplyr::filter(JV == jv_i) %>% 
+      dplyr::filter(jv_responsibility == "stewardship-responsibilty") %>% 
+      dplyr::filter(bird_group == group_i) %>% 
+      dplyr::filter(breeding_biome == biome_i) %>% 
+      dplyr::filter(season == season_i) %>% 
+      dplyr::select(file_path) %>% 
+      unique()
+  }
+  
+  else {
+    
+    # include species that are of stewardship responsibility and all other species that meet other criteria
+    file_combos[[i]] <- 
+      jv_rosen_data %>% 
+      dplyr::filter(JV == jv_i) %>% 
+      dplyr::filter(jv_responsibility == "stewardship-responsibilty" | jv_responsibility == "all-species") %>% 
+      dplyr::filter(bird_group == group_i) %>% 
+      dplyr::filter(breeding_biome == biome_i) %>% 
+      dplyr::filter(season == season_i) %>% 
+      dplyr::select(file_path) %>% 
+      unique()
+    
+  }
 }
 
 

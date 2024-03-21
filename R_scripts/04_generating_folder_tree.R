@@ -2,36 +2,19 @@ library(here)
 library(tidyverse)
 
 
-
 # ----------------------------------------------
 # import data from "generating_file_lists_for_species_combos.R"
-biome_group_combos <- readRDS(file=here("data/rds_files/biome_group_combos.rds"))
-possible_seasons <- readRDS(file=here("data/rds_files/possible_seasons.rds"))
+variable_combos <- readRDS(file=here("data/rds_files/variable_combos.rds"))
+file_combos <- readRDS( file=here("data/rds_files/files_to_stack.rds"))
 
+# create folder names
+folder_names <- 
+  sapply(variable_combos, str_replace_all, pattern="_", replacement="/") %>% 
+  paste(here(), ., sep="/")
 
-# ----------------------------------------------
-# create folder tree to house sorted raster files
+# create directories (be careful, this write to your local machine!)
+sapply(folder_names, dir.create, recursive = TRUE)
 
-### WORKING ON THIS
-boundary_folders <- paste(here("data/output/"), c("/cijv", "/pbjv"), sep="")
-priority_folders <- sapply(boundary_folders, paste, c("/priority_species", "/all_species"), sep="")
-
-
-
-sapply(priority_folders, dir.create)
-
-root_directory <- paste(here("data/output"), biome_group_combos$value, sep = "/")
-sapply(root_directory, dir.create)
-####
-
-
-
-# create subfolders names using season types
-f <- function(x) {paste(x, possible_seasons, sep = "/")}
-sub_directories <- sapply(root_directory, f)
-
-# create the subdirs
-sapply(sub_directories, dir.create)
 
 
 
