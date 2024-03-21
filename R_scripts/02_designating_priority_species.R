@@ -14,8 +14,8 @@ jv_responsibility <- jv_longformat %>%
   group_by(full_name) %>% 
   mutate(percentile_pop = percent_rank(prop_pop)) %>% 
   mutate(jv_responsibility = if_else(percentile_pop > .9,
-                          "TRUE",
-                          "FALSE",
+                          "stewardship-responsibility",
+                          "all-species",
                           missing = "NA")) %>%
   # remove extra rows for the resident species (if same abundance each season)
   # first, change season value to "resident"
