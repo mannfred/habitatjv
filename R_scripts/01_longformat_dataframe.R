@@ -16,6 +16,7 @@ jv_data <-
   dplyr::rename(resident = Resident) %>% 
   dplyr::mutate(resident = if_else(resident == TRUE, "resident", "non-resident", missing=NA))
 
+
 # import data from Rosenberg et al (2019): https://www.science.org/doi/10.1126/science.aaw1313
 # only 529 species represented, so there may not be complete overlap with `jv_data`
 rosenberg_data <- 
@@ -42,6 +43,8 @@ spp_w_data <-
   dplyr::filter(full_name == "CIJV_Boundary_Complete.shp" | full_name == "PacificBirds_JV_Boundary.shp") %>% 
   select(species_code) %>% 
   unique() #506 species
+
+
 
 # --------------------------------------------
 # find species with missing data
@@ -80,7 +83,7 @@ jv_longformat <-
   jv_rosen_data %>% 
   tidyr::pivot_longer(cols = ends_with("prop_pop"), values_to = "prop_pop", names_to = "season") %>% 
   dplyr::mutate(season = str_remove(.$season, "_prop_pop")) %>% 
-  dplyr::mutate(file_name_suffix = case_when(season == "nbreeding" & resident == "non-resident" ~ "full-year_max_21.tif",
+  dplyr::mutate(file_name_suffix = case_when(season == "nbreeding" & resident == "non-resident" ~ "abundance_full-year_max_21.tif",
                                                season == "breeding" & resident == "non-resident" ~ "breeding_abundance_seasonal_mean_21.tif",
                                                season == "postbreedingm"& resident == "non-resident" ~ "post-breeding_mig_abundance_seasonal_mean_21.tif",
                                                season == "prebreedingm" & resident == "non-resident" ~ "pre-breeding_mig_abundance_seasonal_mean_21.tif",
@@ -92,6 +95,14 @@ file_path <-
 
 # add file paths to dataframe
 jv_longformat$file_path <- file_path
+
+
+
+# 
+# # check that raster files actually exist in dataset
+# existing_rasters <- c(list.files(path=here("data/CIJV"), full.names=TRUE), list.files(path=here("data/PacificBirds"), full.names=TRUE))
+# 
+# which(!(file_path %in% existing_rasters))
 
 
 # assign stewardship responsibility labels --------------------------------

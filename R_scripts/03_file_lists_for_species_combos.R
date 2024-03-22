@@ -2,7 +2,7 @@ library(here)
 library(tidyverse)
 
 
-jv_rosen_data <- readRDS(file=here("data/rds_files/jv_data_with_birdgroups_biomes_and_responsibility.rds"))
+jv_rosen_data <- readRDS(file=here("data/rds_files/jv_longformat.rds"))
 
 
 # ----------------------------------------------
@@ -10,7 +10,7 @@ jv_rosen_data <- readRDS(file=here("data/rds_files/jv_data_with_birdgroups_biome
 # then, filter JV data by all possible permutations
 
 variable_combos <-
-  paste(jv_rosen_data$JV, jv_rosen_data$jv_responsibility, jv_rosen_data$bird_group, jv_rosen_data$breeding_biome, jv_rosen_data$season, sep="_") %>% 
+  paste(jv_rosen_data$JV, jv_rosen_data$stewardship_responsibility, jv_rosen_data$bird_group, jv_rosen_data$breeding_biome, jv_rosen_data$season, sep="_") %>% 
   unique() %>% 
   as_tibble()
 
@@ -33,7 +33,7 @@ for (i in 1:nrow(variable_combos)){
     file_combos[[i]] <- 
       jv_rosen_data %>% 
       dplyr::filter(JV == jv_i) %>% 
-      dplyr::filter(jv_responsibility == "stewardship-responsibilty") %>% 
+      dplyr::filter(stewardship_responsibility == "stewardship-responsibilty") %>% 
       dplyr::filter(bird_group == group_i) %>% 
       dplyr::filter(breeding_biome == biome_i) %>% 
       dplyr::filter(season == season_i) %>% 
@@ -47,7 +47,7 @@ for (i in 1:nrow(variable_combos)){
     file_combos[[i]] <- 
       jv_rosen_data %>% 
       dplyr::filter(JV == jv_i) %>% 
-      dplyr::filter(jv_responsibility == "stewardship-responsibilty" | jv_responsibility == "all-species") %>% 
+      dplyr::filter(stewardship_responsibility == "stewardship-responsibilty" | stewardship_responsibility == "all-species") %>% 
       dplyr::filter(bird_group == group_i) %>% 
       dplyr::filter(breeding_biome == biome_i) %>% 
       dplyr::filter(season == season_i) %>% 
