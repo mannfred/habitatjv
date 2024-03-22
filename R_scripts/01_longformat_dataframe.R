@@ -85,7 +85,7 @@ jv_longformat <-
   dplyr::mutate(season = str_remove(.$season, "_prop_pop")) %>% 
   dplyr::mutate(file_name_suffix = case_when(season == "nbreeding" & resident == "non-resident" ~ "abundance_full-year_max_21.tif",
                                                season == "breeding" & resident == "non-resident" ~ "breeding_abundance_seasonal_mean_21.tif",
-                                               season == "postbreedingm"& resident == "non-resident" ~ "post-breeding_mig_abundance_seasonal_mean_21.tif",
+                                               season == "postbreedingm" & resident == "non-resident" ~ "post-breeding_mig_abundance_seasonal_mean_21.tif",
                                                season == "prebreedingm" & resident == "non-resident" ~ "pre-breeding_mig_abundance_seasonal_mean_21.tif",
                                                resident == "resident" ~ "abundance_seasonal_mean_21.tif")) 
 file_path <- 
