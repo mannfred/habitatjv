@@ -75,6 +75,19 @@ jv_rosen_data <-
   dplyr::left_join(jv_data, rosenberg_data, by="species") %>% 
   tidyr::drop_na()
 
+# inspect file names to learn naming conventions
+pb <- 
+  str_split(list.files(here("data/PacificBirds")), pattern="_", simplify=TRUE) %>% 
+  as_tibble() %>% 
+  select(-c(1:2)) %>% 
+  distinct()
+
+ci <-
+  str_split(list.files(here("data/CIJV")), pattern="_", simplify=TRUE) %>% 
+  as_tibble() %>% 
+  select(-c(1:2)) %>% 
+  distinct()
+  
 # migrating species have four unique "proportion of population" entries,
 # one each for pre-, post-, breeding, and non-breeding abundances
 # here, we transform the data to long format so that migrating species get four rows,
@@ -83,11 +96,11 @@ jv_longformat <-
   jv_rosen_data %>% 
   tidyr::pivot_longer(cols = ends_with("prop_pop"), values_to = "prop_pop", names_to = "season") %>% 
   dplyr::mutate(season = str_remove(.$season, "_prop_pop")) %>% 
-  dplyr::mutate(file_name_suffix = case_when(season == "nbreeding" & resident == "non-resident" ~ "abundance_full-year_max_21.tif",
-                                               season == "breeding" & resident == "non-resident" ~ "breeding_abundance_seasonal_mean_21.tif",
-                                               season == "postbreedingm" & resident == "non-resident" ~ "post-breeding_mig_abundance_seasonal_mean_21.tif",
-                                               season == "prebreedingm" & resident == "non-resident" ~ "pre-breeding_mig_abundance_seasonal_mean_21.tif",
-                                               resident == "resident" ~ "abundance_seasonal_mean_21.tif")) 
+  dplyr::mutate(file_name_suffix = case_when(season == "nbreeding" & resident == "non-resident" ~ "nonbreeding_abundance_seasonal_mean_21.tif",
+                                             season == "breeding" & resident == "non-resident" ~ "breeding_abundance_seasonal_mean_21.tif",
+                                             season == "postbreedingm" & resident == "non-resident" ~ "post-breeding_mig_abundance_seasonal_mean_21.tif",
+                                             season == "prebreedingm" & resident == "non-resident" ~ "pre-breeding_mig_abundance_seasonal_mean_21.tif",
+                                             resident == "resident" ~ "abundance_seasonal_mean_21.tif")) 
 file_path <- 
   paste(here("data//"), jv_longformat$JV, sep="") %>% #folder name
   paste(., jv_longformat$JV, sep="/") %>% #JV name
@@ -121,7 +134,7 @@ jv_longformat <- jv_longformat %>%
                                      missing = "NA")) %>%
   # remove extra rows for the resident species (if same abundance each season)
   # first, change season value to "resident"
-  mutate(season = if_else(resident == TRUE,
+  mutate(season = if_else(resident == "resident",
                           "resident",
                           season)) %>% 
   # then drop duplicate rows with distinct()

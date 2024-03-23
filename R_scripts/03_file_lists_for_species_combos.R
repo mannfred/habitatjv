@@ -43,7 +43,7 @@ for (i in 1:nrow(variable_combos)){
   
   else {
     
-    # include species that are of stewardship responsibility and all other species that meet other criteria
+    # include species that are of stewardship responsibility and non-stewardship responsibility
     file_combos[[i]] <- 
       jv_rosen_data %>% 
       dplyr::filter(JV == jv_i) %>% 
@@ -57,6 +57,12 @@ for (i in 1:nrow(variable_combos)){
   }
 }
 
+# not all variable permutations have associtated raster data 
+# e.g. yellow-throated warbler (PacificBirds JV) has 4 entries in JV dataframe, but only 2 are represented in raster folder
+# remove names from `file_combos` that don't actually exist as raster data
+raster_files <- list.files(path=here("data/"), pattern=".tif", recursive=TRUE, full.names=TRUE)
 
-saveRDS(file_combos, file=here("data/rds_files/files_to_stack.rds"))
+real_files <- lapply(file_combos, function(q) {q %>% dplyr::filter(file_path %in% raster_files)}) 
+saveRDS(real_files, file=here("data/rds_files/files_to_stack.rds"))
+
 
