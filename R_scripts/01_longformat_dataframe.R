@@ -110,15 +110,8 @@ file_path <-
 jv_longformat$file_path <- file_path
 
 
-
-# 
-# # check that raster files actually exist in dataset
-# existing_rasters <- c(list.files(path=here("data/CIJV"), full.names=TRUE), list.files(path=here("data/PacificBirds"), full.names=TRUE))
-# 
-# which(!(file_path %in% existing_rasters))
-
-
-# assign stewardship responsibility labels --------------------------------
+# --------------------------------------------
+# assign stewardship responsibility labels 
 
 # From Andrew Huang: for each season, we define “Stewardship Responsibility” as 
 # the top 90 percentile of species with the highest proportion

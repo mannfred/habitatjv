@@ -1,5 +1,4 @@
 library(here)
-library(rnaturalearth)
 library(terra)
 library(tidyverse)
 
@@ -53,33 +52,3 @@ dir_name <-
 mapply(terra::writeRaster, stacked_rasters, dir_name)
 
 
-# ---------------------------------------
-# inspect by plotting 
-# from Strimas-Mackey: https://ebird.github.io/ebirdst/articles/applications.html#map-extent
-region_boundary <- rnaturalearth::ne_countries(country = c("canada", "united states of america"))
-
-# project boundary to match raster data
-test_raster <- rast(old_names[1])
-region_boundary_proj <- st_transform(region_boundary, st_crs(test_raster))
-
-# crop and mask to boundary
-raster_masked <- 
-  crop(stacked_rasters[[1]], region_boundary_proj) %>% 
-  mask(region_boundary_proj)
-
-# find the centroid of the region
-region_centroid <-
-  region_boundary %>% 
-  st_geometry() %>%  
-  st_transform(crs = 4326) %>%  
-  st_centroid() %>%  
-  st_coordinates() %>%  
-  round(1)
-
-# define projection
-crs_laea <- paste0("+proj=laea +lat_0=", region_centroid[2],
-                   " +lon_0=", region_centroid[1])
-
-raster_laea <- terra::project(raster_masked[[1]], crs_laea, method="near") |> 
-  # remove areas of the raster containing no data
-  trim()  

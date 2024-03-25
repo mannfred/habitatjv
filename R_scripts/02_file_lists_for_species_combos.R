@@ -27,13 +27,13 @@ for (i in 1:nrow(variable_combos)){
   biome_i <- stringr::str_split_i(variable_combos[i,], pattern="_", i=4)
   season_i <- stringr::str_split_i(variable_combos[i,], pattern="_", i=5)
  
-  if (responsibility_i == "stewardship-responsibilty") { 
+  if (responsibility_i == "stewardship-responsibility") { 
     
     # limit to species that are of stewardship responsibility
     file_combos[[i]] <- 
       jv_rosen_data %>% 
       dplyr::filter(JV == jv_i) %>% 
-      dplyr::filter(stewardship_responsibility == "stewardship-responsibilty") %>% 
+      dplyr::filter(stewardship_responsibility == "stewardship-responsibility") %>% 
       dplyr::filter(bird_group == group_i) %>% 
       dplyr::filter(breeding_biome == biome_i) %>% 
       dplyr::filter(season == season_i) %>% 
@@ -47,7 +47,7 @@ for (i in 1:nrow(variable_combos)){
     file_combos[[i]] <- 
       jv_rosen_data %>% 
       dplyr::filter(JV == jv_i) %>% 
-      dplyr::filter(stewardship_responsibility == "stewardship-responsibilty" | stewardship_responsibility == "all-species") %>% 
+      dplyr::filter(stewardship_responsibility == "stewardship-responsibility" | stewardship_responsibility == "all-species") %>% 
       dplyr::filter(bird_group == group_i) %>% 
       dplyr::filter(breeding_biome == biome_i) %>% 
       dplyr::filter(season == season_i) %>% 
