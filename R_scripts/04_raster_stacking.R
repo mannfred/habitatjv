@@ -5,8 +5,6 @@ library(tidyverse)
 
 
 # ----------------------------------------------
-
-
 #rename files in Pacific Birds folder to match naming convention of CIJV folder
 old_names <- list.files(path=here("data/PacificBirds"), full.names=TRUE)
 new_names <- gsub("JV_", "", old_names)
