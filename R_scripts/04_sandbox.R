@@ -1,7 +1,14 @@
 library(here)
 library(tidyverse)
 
+reporttable <- 
+  jv_rosen_data %>% 
+  filter(JV== "CIJV" & stewardship_responsibility != "all-species" & resident == "non-resident" &
+         bird_group == "landbird" & breeding_biome=="Forest Generalist" & season == "breeding") %>% 
+  dplyr::select(JV, species, resident, stewardship_responsibility, breeding_biome, bird_group, season)
+  
 
+write.csv(reporttable, file=here("paperwork/report_table.csv"))
 # ---------------------------------------
 # inspect stacked rasters by plotting 
 # from Strimas-Mackey: https://ebird.github.io/ebirdst/articles/applications.html#map-extent
